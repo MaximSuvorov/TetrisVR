@@ -1,12 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TetrisVR.CSharp", "TetrisVR.CSharp.csproj", "{A3BFF971-4415-9B4E-38DB-F6DDFAF6A838}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3BFF971-4415-9B4E-38DB-F6DDFAF6A838}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3BFF971-4415-9B4E-38DB-F6DDFAF6A838}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3BFF971-4415-9B4E-38DB-F6DDFAF6A838}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3BFF971-4415-9B4E-38DB-F6DDFAF6A838}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
