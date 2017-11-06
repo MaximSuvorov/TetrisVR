@@ -8,19 +8,20 @@ namespace TetrisTools
 {
     public class GameCellPoolPrefabFactory
     {
-        public static GameObject GetMeshByType(int meshType)
+        public static GameObject GetMeshByType(CellTypes meshType)
         {
             string meshName;
             switch (meshType)
             {
-                case 1:
+                case CellTypes.baseType:
                     meshName = "NormalTetrisBrick";
                     break;
-                case -2:
-                    meshName = "NormalTetrisBrick";
+                case CellTypes.borderBrick:
+                    meshName = "BorderBrick";
                     break;
                 default:
                     meshName = "None";
+                    Debug.LogError("Mesh type not found. Mesh type: " + meshType.ToString());
                     break;
             }
             if (string.Compare(meshName, "None", true)==0) 
@@ -81,17 +82,17 @@ namespace TetrisTools
             return obj;
         }
 
-        public void AddFreeObject(int MeshType, GameObject mesh)
+        public void AddFreeObject(CellTypes MeshType, GameObject mesh)
         {
-            if (!Instance.objectPoolFree.ContainsKey(MeshType))
+            if (!Instance.objectPoolFree.ContainsKey((int)MeshType))
             {
-                Instance.objectPoolFree.Add(MeshType, new List<GameObject>());
+                Instance.objectPoolFree.Add((int)MeshType, new List<GameObject>());
             }
             mesh.SetActive(false);
-            Instance.objectPoolFree[MeshType].Add(mesh);
+            Instance.objectPoolFree[(int)MeshType].Add(mesh);
         }
 
-        private void FillFreePool(int meshType)
+        private void FillFreePool(CellTypes meshType)
         {
             for (int i=0; i<GameSettings.sizex*GameSettings.sizey; i++)
             {
@@ -109,7 +110,7 @@ namespace TetrisTools
             {
                 if (meshType > 0) 
                 {
-                    Instance.FillFreePool((int)meshType);
+                    Instance.FillFreePool(meshType);
                 }
             }
         }

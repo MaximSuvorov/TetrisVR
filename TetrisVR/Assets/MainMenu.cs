@@ -7,16 +7,16 @@ public class MainMenu : MonoBehaviour {
 
     public static MainMenu instance;
 
-    public GameObject NewGameBtn;
-    public GameObject ExitBtn;
+    public Button NewGameBtn;
+    public Button ExitBtn;
     public GameObject MainGameCanvas;
 
 
 	// Use this for initialization
 	void Start () {
-        NewGameBtn = transform.FindChild("NewGame").gameObject;
-        ExitBtn = transform.FindChild("Exit").gameObject;
-        NewGameBtn.GetComponent<Button>().onClick.AddListener(OnNewGameClick);
+        NewGameBtn = transform.FindChild("NewGame").gameObject.GetComponent<Button>();
+        ExitBtn = transform.FindChild("Exit").gameObject.GetComponent<Button>();
+        NewGameBtn.onClick.AddListener(OnNewGameClick);
         ExitBtn.GetComponent<Button>().onClick.AddListener(OnExitClick);
         MainGameCanvas = GameObject.Find("MainGameCanvas");
         MainGameCanvas.SetActive(false);

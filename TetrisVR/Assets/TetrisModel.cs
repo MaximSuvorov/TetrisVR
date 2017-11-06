@@ -4,115 +4,6 @@ using System;
 using TetrisTools;
 
 
-
-
-//procedure drawfield;
-//var i, j : integer;
-//begin
-//    setfillstyle(solidfill, black );
-//    bar( 11, 1, 160, 260 );
-//    for i := 1 to 15 do
-//    for j := 1 to 25 do
-//    if field[i, j] then
-//    begin
-//        setfillstyle(solidfill, green );
-//        bar( 10 * i + 1, 10 * j + 1, 10 *( i + 1 ), 10 *( j + 1 ) );
-//        setfillstyle(solidfill, blue );
-//        bar( 10 * i + 3, 10 * j + 3, 10 *( i + 1 ) - 2, 10 *( j + 1 ) - 2 );
-//    end;
-//    setfillstyle(solidfill, black );
-//    bar( 250, 180, 300, 230 );
-//    for i := 1 to size[next] do
-//    for j := 1 to size[next] do
-//    if nextblock[i, j] then
-//    begin
-//        setfillstyle(solidfill, green );
-//        bar( 10 * i + 251, 10 * j + 181, 10 *( i + 1 ) + 250, 10 *( j + 1 ) + 180 );
-//        setfillstyle(solidfill, blue );
-//        bar( 10 * i + 253, 10 * j + 183, 10 *( i + 1 ) + 248, 10 *( j + 1 ) + 178 );
-//    end;
-//end;
-
-//procedure delblock;
-//var i, j : integer;
-//begin
-//    setfillstyle(solidfill, black );
-//    for i := 1 to size[k] do
-//    for j := 1 to size[k] do
-//    if block[i, j] then bar( 10 * x + 10 * i + 1, 10 * y + 10 * j + 1,
-//                               10 * x + 10 *( i + 1 ), 10 * y + 10 *( j + 1 ) );
-//end;
-
-//procedure delline(h : integer );
-//var i, j, k, c : integer;
-//begin
-//    c := 0;
-//    for j := h to h + 3 do
-//    begin
-//        if j > 25 then break;
-//        i := 1;
-//        while( field[i, j] ) and(i< 15 ) do
-//            inc(i );
-//        if( field[i, j] ) and(i = 15) then
-//    begin
-//            inc(c );
-//            for i := 1 to 15 do
-//            for k := j downto 2 do
-//                field[i, k] := field[i, k - 1];
-//        end;
-//    end;
-//    drawfield;
-//    score := score + c* c;
-//    if( score >= 50 * level ) and(level< 10 ) then inc(level );
-//updatescore;
-//end;
-
-
-
-//procedure move(m : integer );
-//var i, j : integer;
-//begin
-//    for i := 1 to size[k] do
-//    for j := 1 to size[k] do
-//    if( block[i, j] ) and(( i + x + m > 15 ) or(i + x + m< 1 )
-//                        or(field[x + i + m, y + j] ) ) then exit;
-//delblock;
-//    if m = 1 then inc(x ) else dec(x );
-//drawblock;
-//end;
-
-//procedure movedown;
-//var i, j, i1, j1 : integer;
-//begin
-//    for i := 1 to size[k] do
-//    for j := 1 to size[k] do
-//    if( block[i, j] ) and(( field[i + x, j + 1 + y] ) or(j + y >= 25 ) ) then
-//begin
-//        if y = 0 then for i1 := 1 to size[k] do
-//        if block[i1, 1] then
-//        begin
-//            k := 8;
-//            exit
-//        end;
-//        for i1 := 1 to size[k] do
-//        for j1 := 1 to size[k] do
-//        if block[i1, j1] then field[i1 + x, j1 + y] := true;
-//        block := nextblock;
-//        k := next;
-//        next := random( 7 ) + 1;
-//        build(next, nextblock );
-//        delline(y + 1 );
-//x := 6;
-//        y := 0;
-//        exit;
-//    end;
-//    delblock;
-//    inc(y );
-//drawblock;
-//end;
-
-
-
 //procedure pause;
 //begin
 //    clearviewport;
@@ -190,8 +81,6 @@ using TetrisTools;
 
 namespace TetrisCore
 {
-    //d, m, i, j, k, x, y, time, count, score, level, next : integer;
-    //a : char;
 
     public static class GameSettings
     {
@@ -204,13 +93,13 @@ namespace TetrisCore
     {
         empty = 0,
         baseType = 1,
-        borderBrick = -1,
+        borderBrick = 2,
     }
 
 
-    public class TetrisFigureFactory
+    public static class TetrisFigureFactory
     {
-        public TetrisFigure GetNormalFigure(FigureTypes figureType, GameCellPool pool)
+        public static TetrisFigure GetNormalFigure(FigureTypes figureType, GameCellPool pool)
         {
             TetrisFigure obj = new TetrisFigure(pool);
 
@@ -272,6 +161,12 @@ namespace TetrisCore
             obj.curFigureType = figureType;
             return obj;
         }
+
+        public static TetrisFigure RandomizeNormalFigure(GameCellPool pool)
+        {
+            int nF = UnityEngine.Random.Range(1, 8);
+            return TetrisFigureFactory.GetNormalFigure((FigureTypes)nF, pool);
+        }
     }
 
     public class TetrisCell 
@@ -292,14 +187,57 @@ namespace TetrisCore
         {
             CellType = cellType;
             CellMesh = _parentPool.GetFreeMesh((int)cellType);
+            CellMesh.SetActive(true);
         }
 
         public void ClearCell()
         {
             if (CellMesh != null)
             {
-                _parentPool.AddFreeObject((int)CellType, CellMesh);
+                _parentPool.AddFreeObject(CellType, CellMesh);
                 CellMesh = null;
+                CellType = CellTypes.empty;
+            }
+        }
+
+        public bool IsCellEmpty()
+        {
+            return CellType != CellTypes.baseType;
+        }
+
+        public void UpdateCellPosition(int x, int y)
+        {
+            if (CellMesh!=null)
+            {
+                CellMesh.transform.position = new Vector3(x, y, 0);
+            }
+        }
+
+        public void FillCellByCell(TetrisCell cell)
+        {
+            CellType = cell.CellType;
+            CellMesh = CellMesh;
+        }
+    }
+
+    public class TetrisPlayerModel
+    {
+        private static TetrisPlayerModel _instance;
+
+        public int level;
+        public int score;
+
+        private TetrisPlayerModel() { }
+
+        public TetrisPlayerModel Instance
+        {
+            get
+            {
+                if (_instance==null)
+                {
+                    _instance = new TetrisPlayerModel();
+                }
+                return _instance;
             }
         }
     }
@@ -308,86 +246,314 @@ namespace TetrisCore
     public class TetrisField
     {
         public TetrisCell[,] gameField = new TetrisCell[GameSettings.sizex, GameSettings.sizey];
-        public static int[] fsize = new int[] { 2, 4, 3, 3, 3, 3, 3 };
+        //public static int[] fsize = new int[] { 2, 4, 3, 3, 3, 3, 3 };
         public TetrisFigure curFigure;
         public TetrisFigure nextFigure;
+        public TetrisPlayerModel playerModel;
+
+        private GameCellPool _pool;
+        public GameCellPool Pool
+        {
+            get
+            {
+                return _pool;
+            }
+        }
+
+        public TetrisField(GameCellPool pool)
+        {
+            _pool = pool;
+            for (int i = 0; i < GameSettings.sizex; i++)
+            {
+                for (int j = 0; j < GameSettings.sizey; j++)
+                {
+                    gameField[i, j] = new TetrisCell(_pool);
+                }
+            }
+
+            curFigure = TetrisFigureFactory.RandomizeNormalFigure(Pool);
+            curFigure.posx = 6;
+            curFigure.posy = 0;
+            nextFigure = TetrisFigureFactory.RandomizeNormalFigure(Pool);
+        }
 
         public FigureTypes curFigureType; //k = figure int type
 
+        public void DrawField()
+        {
+            for (int i = 0; i < GameSettings.sizex; i++)
+            {
+                for (int j = 0; j < GameSettings.sizey; j++)
+                {
+                    if (!gameField[i,j].IsCellEmpty())
+                    {
+                        gameField[i, j].UpdateCellPosition(i, j);
+                    }
+                }
+            }
+            curFigure.DrawFigure();
+            nextFigure.DrawFigure(GameSettings.sizex + 10, GameSettings.sizey - 10);
+        }
 
+        public void DeleteLine(int h)
+        {
+            int count = 0;
+            for (int j = h; j < h+4; j++)
+            {
+                if (j>GameSettings.sizey-2) break;
+                int numBricks = 0;
+                for (int i = 0; i < GameSettings.sizex; i++)
+                {
+                    if (!gameField[i, j].IsCellEmpty()) numBricks++;
+                }
+                if (numBricks==GameSettings.sizex)
+                {
+                    count++;
+                    for (int i = 0; i < GameSettings.sizex; i++)
+                    {
+                        for (int k = j; k > 1; k--)
+                        {
+                            gameField[i, k].ClearCell();
+                            gameField[i, k].FillCellByCell(gameField[i, k-1]);
+                            gameField[i, k - 1].ClearCell();
+                        }
+                    }
+                }
+                playerModel.Instance.score += count * count;
+            }
+        }
+
+        public void TryMoveFigure(int move)
+        {
+            bool AllowMove = true;
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    if (!curFigure.gameFigure[i,j].IsCellEmpty() && 
+                        ((i+curFigure.posx+move>GameSettings.sizex) || 
+                        (i + curFigure.posx + move <0) || (!gameField[curFigure.posx+i+move, curFigure.posy+j].IsCellEmpty())))
+                    {
+                        AllowMove = false;
+                        break;
+                    }
+                }
+                if (!AllowMove) break;
+            }
+            if (AllowMove)
+            {
+                curFigure.posx += move;
+            }
+        }
+
+        public void TryMoveDown()
+        {
+            bool keepLoop = true;
+            for (int i = 0; i < 4 && keepLoop; i++)
+            {
+                for (int j = 0; j < 4 && keepLoop; j++)
+                {
+                    if ((!curFigure.gameFigure[i,j].IsCellEmpty()) && 
+                        (!(gameField[i+curFigure.posx, j+curFigure.posy+1].IsCellEmpty() ||
+                        (j+curFigure.posy>=GameSettings.sizey))))
+                    {
+                        if (curFigure.posy == 0)
+                        {
+                            for (int i1 = 0; i1 < 4; i1++)
+                            {
+                                if (!curFigure.gameFigure[i1, 0].IsCellEmpty())
+                                {
+                                    keepLoop = false;
+                                    break;
+                                }
+                            }
+                        }
+                        for (int i1 = 0; i1 < 4; i1++)
+                        {
+                            for (int j1 = 0; j1 < 4; j1++)
+                            {
+                                gameField[i1 + curFigure.posx, j1 + curFigure.posy].FillCellByCell(curFigure.gameFigure[i1,j1]);
+                                //curFigure.gameFigure[i1, j1].ClearCell();
+                            }
+                        }
+                        //do next block and remove curFigure
+                        curFigure = nextFigure;
+                        //    x := 6;
+                        //y:= 0;
+                        curFigure.posx = 6;
+                        curFigure.posy = 0;
+                        nextFigure = TetrisFigureFactory.RandomizeNormalFigure(Pool);
+                        keepLoop = false;
+                    }
+                }
+            }
+            if (keepLoop) curFigure.posy++;        }
+
+        public void TryRotateFigure()
+        {
+            //TetrisFigure testMask = new TetrisFigure(_pool);
+            bool AllowRotate = true;
+            TetrisFigure tmpFig = new TetrisFigure(Pool);
+            if (curFigure.curFigureType == FigureTypes.two) //    if k = 2 then
+            {             //    begin
+                if (!curFigure.gameFigure[1,0].IsCellEmpty()) //        if block[2, 1] then
+                {//        begin
+                    for (int i = 0; i < 4; i++)//            for i := 1 to 4 do
+                    {//            begin
+                     //                block1[i, 2] := true;
+                        tmpFig.gameFigure[i, 1].FillCell(curFigure.gameFigure[1, i].CellType);
+                        if ((gameField[i + curFigure.posx, 2 + curFigure.posy].CellType != CellTypes.empty) || //if( field[i + x, 2 + y] ) 
+                            (i + curFigure.posx > GameSettings.sizex) || (i + curFigure.posx < 1) || //   or(i + x > 15 ) or(i + x< 1 )                      
+                            (curFigure.posx + 2 > GameSettings.sizey) || (curFigure.posy + 2 < 1)) //or( 2 + y > 25 ) or( 2 + y< 1 ) then
+                        {//               begin
+                            //code: drawblock as is//drawblock;
+                            AllowRotate = false;//exit;
+                        }//                end;
+                    }
+                    //            end;                      //            block := block1;
+                }//        end
+                else  //        else
+                {//        begin
+                    for (int i = 0; i < 3; i++)
+                    {
+                        tmpFig.gameFigure[1, i].FillCell(curFigure.gameFigure[i, 1].CellType);
+                    }//code: rotate block//            for i := 1 to 4 do
+                    //                block1[2, i] := true;
+                    //            block := block1;
+                    AllowRotate = true;
+                }//        end;
+            }//    end
+            else if (curFigureType > FigureTypes.two) //    else if k > 2 then
+            {//    begin
+                for (int i = 0; i < 3; i++)
+                {//        for i := 1 to 3 do
+                    for (int j = 0; j < 3; j++)
+                    {//        for j := 1 to 3 do
+                        tmpFig.gameFigure[i, j].FillCell(curFigure.gameFigure[3 - j, i].CellType);
+                        if (!curFigure.gameFigure[3-j,i].IsCellEmpty()) 
+                        {
+
+                            if (((!this.gameField[i+curFigure.posx, j+curFigure.posy].IsCellEmpty()) ||
+                                (i+curFigure.posx>GameSettings.sizex) || (i+curFigure.posx<1) ||
+                                (j+curFigure.posy > GameSettings.sizey) || (j + curFigure.posx < 1)) &&
+                                (!curFigure.gameFigure[i,j].IsCellEmpty())
+                                )
+                            {
+                                AllowRotate = false;
+                            }
+                        }
+                    }
+                }
+            }
+            if (AllowRotate)
+            {
+                curFigure.ClearMeshes();
+                curFigure.gameFigure = tmpFig.gameFigure;
+            }
+            //    drawblock;
+        }
+
+        public void ResetGame ()
+        {
+            for (int i = 0; i < GameSettings.sizex; i++)
+            {
+                for (int j = 0; j < GameSettings.sizey; j++)
+                {
+                    gameField[i, j].ClearCell();
+                }
+            }
+
+            curFigure = TetrisFigureFactory.RandomizeNormalFigure(Pool);
+            curFigure.posx = 6;
+            curFigure.posy = 0;
+            nextFigure = TetrisFigureFactory.RandomizeNormalFigure(Pool);
+        }
+
+
+        public void DoGameTickProgress()
+        {
+            TryMoveDown();
+        }
+
+        public void DoControllProgress(TetrisControllMove move)
+        {
+            switch (move)
+            {
+                case TetrisControllMove.left: TryMoveFigure(-1);
+                    break;
+                case TetrisControllMove.right: TryMoveFigure(1);
+                    break;
+                case TetrisControllMove.rotate: TryRotateFigure();
+                    break;
+            }
+        }
+
+        public void DebugLogState()
+        {
+            Debug.Log("Cur: figure:");
+            for (int i = 0; i < 4; i++)
+            {
+                string line= "";
+                for (int j = 0; j < 4; j++)
+                {
+                    line += curFigure.gameFigure[i, j].IsCellEmpty() ? "_" : "*";
+                }
+                Debug.Log(line);
+            }
+            Debug.Log("Cur: field:");
+            for (int i = 0; i < GameSettings.sizex; i++)
+            {
+                string line = "";
+                for (int j = 0; j < GameSettings.sizey; j++)
+                {
+                    line += gameField[i, j].IsCellEmpty() ? "_" : "*";
+                }
+                Debug.Log(line);
+            }
+
+        }
     }
 
     public class TetrisFigure
     {
-        public TetrisCell[,] gameFigure = new TetrisCell[3, 3];
+        public TetrisCell[,] gameFigure = new TetrisCell[4, 4];
         private GameCellPool _pool;
         public FigureTypes curFigureType;
         public int posx, posy; 
 
         public TetrisFigure(GameCellPool pool)
         {
+            _pool = pool;
             for (int i=0; i<4; i++)
             {
                 for (int j=0; j<4; j++)
                 {
-                    gameFigure[i, j] = new TetrisCell(pool);
-                    //gameFigure[i, j].CellType
+                    gameFigure[i, j] = new TetrisCell(_pool);
+                    gameFigure[i, j].CellType = CellTypes.empty;
                 }
             } 
         }
 
-        public void RotateFigure(TetrisField field)
+        public void ClearMeshes()
         {
-            //TetrisFigure testMask = new TetrisFigure(_pool);
-            bool AllowRotate = true;
-            if (curFigureType == FigureTypes.two) //    if k = 2 then
-            {             //    begin
-                if (this.gameFigure[1, 0].CellType == CellTypes.baseType) //        if block[2, 1] then
-                {//        begin
-                    for (int i = 0; i < 4; i++)//            for i := 1 to 4 do
-                    {//            begin
-                     //                block1[i, 2] := true;
-                        if ((field.gameField[i + posx, 2 + posy].CellType != CellTypes.empty) || //if( field[i + x, 2 + y] ) 
-                            (i + posx > 15) || (i + posx < 1) || //   or(i + x > 15 ) or(i + x< 1 )                      
-                            (posx + 2 > 26) || (posy + 2 < 1)) //or( 2 + y > 25 ) or( 2 + y< 1 ) then
-                        {//               begin
-                            //code: drawblock as is//drawblock;
-                            AllowRotate = false;//exit;
-                        }//                end;
-                    }//            end;                      //            block := block1;
-                }//        end
-                else  //        else
-                {//        begin
-                 //code: rotate block//            for i := 1 to 4 do
-                 //                block1[2, i] := true;
-                 //            block := block1;
-                    AllowRotate = true;
-                }//        end;
-            }//    end
-            else if (curFigureType > FigureTypes.two) //    else if k > 2 then
-            {//    begin
-                for (int i=0; i<4; i++)
-                {//        for i := 1 to 3 do
-                    for (int j=0; j<4; j++)
-                    {//        for j := 1 to 3 do
-                        if (true) //        if block[4 - j, i] then
-                {//        begin
-                 //            block1[i, j] := block[4 - j, i];
-                 if (true)//            if(( field[i + x, j + y] ) or(i + x > 15 ) or(i + x< 1 ) or(j + y > 25 )
-                 //                                         or(j + y< 1 ) ) and(block1[i, j] ) then
-                    {//       begin
-                     //code//                drawblock;
-                                AllowRotate = false;//                exit
-                    }//            end;
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    gameFigure[i, j].ClearCell();
                 }
-                    }
-                }//end;
-                 //        block := block1;
-            }//    end;
-            //    drawblock;
+            }
         }
 
+        public void RotateFigure(TetrisField field)
+        {
+        }
         public void DrawFigure()
+        {
+            DrawFigure(0, 0);
+        }
+
+        public void DrawFigure(int offsetx, int offsety)
         {
             for (int i = 0; i < 4; i++)
             {
@@ -395,7 +561,7 @@ namespace TetrisCore
                 {
                     if (gameFigure[i, j].CellType==CellTypes.baseType)
                     {
-                        gameFigure[i, j].CellMesh.transform.position = new Vector3(i+posx, j+posy, 0);
+                        gameFigure[i, j].CellMesh.transform.position = new Vector3(i+posx+ offsetx, j+posy+offsety, 0);
                     }
                 }
             }
@@ -411,6 +577,14 @@ namespace TetrisCore
        five = 5, 
        six = 6, 
        seven = 7
+    }
+
+    public enum TetrisControllMove
+    {
+        rotate,
+        left,
+        right,
+        down
     }
 
 
