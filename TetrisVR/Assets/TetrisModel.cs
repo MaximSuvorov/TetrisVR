@@ -180,6 +180,16 @@ namespace TetrisCore
                 for (int j = 0; j < GameSettings.sizey+5; j++)
                 {
                     gameField[i, j] = new TetrisCell();
+                    gameField[i, j].FillCell(CellTypes.baseType);
+                }
+            }
+
+            for (int i = 0; i < GameSettings.sizex; i++)
+            {
+                for (int j = 0; j < GameSettings.sizey; j++)
+                {
+                    gameField[i, j] = new TetrisCell();
+                    gameField[i, j].FillCell(CellTypes.empty);
                 }
             }
 
