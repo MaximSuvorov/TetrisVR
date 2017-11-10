@@ -19,9 +19,7 @@ public class MainMenu : MonoBehaviour {
         NewGameBtn.onClick.AddListener(OnNewGameClick);
         ExitBtn.GetComponent<Button>().onClick.AddListener(OnExitClick);
         MainGameCanvas = GameObject.Find("MainGameCanvas");
-        MainGameCanvas.SetActive(false);
-        Debug.Log("Inited");
-        Debug.Log(GameCellPool.Instance.GetPoolSize().ToString());
+        GameStateMachine.Instance.SwitchToMainMenu();
     }
 
     // Update is called once per frame
@@ -31,10 +29,7 @@ public class MainMenu : MonoBehaviour {
 
     void OnNewGameClick ()
     {
-        gameObject.SetActive(false);
-        MainGameCanvas.SetActive(true);
-        //MainGameCanvas.Draw
-        //MainGameCanvas.DrawMenuRect();
+        GameStateMachine.Instance.SwitchToGame();
     }
 
     void OnExitClick()
