@@ -19,7 +19,7 @@ public class MainGameMenu : MonoBehaviour {
 
     public void DrawMenuRect()
     {
-        Debug.Log("Draw Rect");
+        //Debug.Log("Draw Rect");
         if (borderObj.Count == 0)
         {
             //cols:
@@ -52,7 +52,7 @@ public class MainGameMenu : MonoBehaviour {
 
     // Use this for initialization
     void Awake() {
-        Debug.Log("MainGameMenu.Start()");
+        //Debug.Log("MainGameMenu.Start()");
         DrawMenuRect();
 
         scoreText = transform.FindChild("Score").gameObject.GetComponent<Text>();
@@ -146,6 +146,12 @@ public class MainGameMenu : MonoBehaviour {
                 curMove = TetrisControllMove.none;
             }
             //
+
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                lastProgress = 2.0f;
+            }
+
             if (lastProgress > 1.0f)
             {
                 //tetris.DoControllProgress(TetrisControllMove.rotate);
@@ -153,6 +159,9 @@ public class MainGameMenu : MonoBehaviour {
                 scoreText.text = string.Format("Score: {0}", TetrisPlayerModel.Instance.score);
                 lastProgress = 0;
             }
+
+
+
             Rect MoveDownZone = new Rect(150, 0, 800, 200);
             if (((Input.GetKeyDown(KeyCode.DownArrow)) || ((fingerCount > 0) && ((MoveDownZone.Contains(Input.touches[0].position))))) && (controlProgress > .10f))
             {
@@ -165,6 +174,7 @@ public class MainGameMenu : MonoBehaviour {
 
     void OnApplicationQuit()
     {
+        GameScoreTable.Instance.SaveTable();
         borderObj.Clear();
     }
 
@@ -197,7 +207,7 @@ public class MainGameMenu : MonoBehaviour {
 
     void DebugDoLogClick()
     {
-        tetris.DebugLogState();
+        //tetris.DebugLogState();
     }
 
     void DoRotate()

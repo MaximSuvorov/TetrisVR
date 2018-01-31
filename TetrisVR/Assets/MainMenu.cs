@@ -30,6 +30,8 @@ public class MainMenu : MonoBehaviour {
     void OnNewGameClick ()
     {
         GameStateMachine.Instance.SwitchToGame();
+        GameScoreTable.Instance.scoreList.CheckScore(101, "test");
+        GameScoreTable.Instance.SaveTable();
     }
 
     void OnExitClick()

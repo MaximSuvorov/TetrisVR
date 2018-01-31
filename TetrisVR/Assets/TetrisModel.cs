@@ -340,7 +340,7 @@ namespace TetrisCore
                 }//        end
                 else  //        else
                 {//        begin
-                    for (int i = 0; i < 3; i++)
+                    for (int i = 0; i < 4; i++)
                     {
                         tmpFig.gameFigure[1, i].FillCell(curFigure.gameFigure[i, 1].CellType);
                     }//code: rotate block//            for i := 1 to 4 do
@@ -351,7 +351,7 @@ namespace TetrisCore
             }//    end
             else if (curFigure.curFigureType > FigureTypes.two) //    else if k > 2 then
             {//    begin
-                DebugLogFigure(curFigure);
+                //DebugLogFigure(curFigure);
                 for (int i = 0; i < 3; i++)
                 {//        for i := 1 to 3 do
                     for (int j = 0; j < 3; j++)
@@ -374,7 +374,10 @@ namespace TetrisCore
             }
             if ((AllowRotate) && (curFigure.curFigureType >= FigureTypes.two))
             {
-                DebugLogFigure(tmpFig);
+                if (curFigure.curFigureType > FigureTypes.two)
+                {
+                    DebugLogFigure(tmpFig);
+                }
                 curFigure.ClearMeshes();
                 for (int i = 0; i < 4; i++)
                 {
@@ -383,8 +386,10 @@ namespace TetrisCore
                         curFigure.gameFigure[i, j].FillCellByCell(tmpFig.gameFigure[i, j]);
                     }
                 }
-                //curFigure.gameFigure = tmpFig.gameFigure;
-                DebugLogFigure(curFigure);
+                if (curFigure.curFigureType > FigureTypes.two)
+                {
+                    DebugLogFigure(curFigure);
+                }
             }
             //    drawblock;
         }

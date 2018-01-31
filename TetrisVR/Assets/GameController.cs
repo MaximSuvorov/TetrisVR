@@ -2,10 +2,19 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Serialization;
+using System.IO;
 using TetrisCore;
 
 namespace TetrisTools
 {
+
+    public static class GameControllsSettings
+    {
+        public static int MaxLeaderBoardSize = 5;
+    }
+
     public class GameCellPoolPrefabFactory
     {
         public static GameObject GetMeshByType(CellTypes meshType)
@@ -310,6 +319,7 @@ namespace TetrisTools
             Instance.ReplayMenuObj.SetActive(true);
 
             Instance._state = GameStates.replaygame;
+            GameScoreTable.Instance.scoreList.CheckScore(TetrisPlayerModel.Instance.score, DateTime.Now.ToLongDateString());
         }
 
     }
@@ -341,4 +351,118 @@ namespace TetrisTools
 
     }
 
+    public class GameScore
+    {
+        public int score;
+        public string name;
+
+        public GameScore()
+        {
+            score = 0;
+            name = string.Empty;
+        }
+
+        public GameScore(int Score, string Name)
+        {
+            score = Score;
+            name = Name;
+        }
+    }
+
+    public class GameScoreList
+    {
+        public List<GameScore> scoreList = new List<GameScore>();
+
+        public void CheckScore(int newScore, string newName)
+        {
+            newScore = UnityEngine.Random.Range(1, 100) * 10;
+            for (int i = 0; i < scoreList.Count; i++)
+            {
+                if (newScore > scoreList[i].score)
+                {
+                    for (int j = scoreList.Count-1; j > i; j--)
+                    {
+                        scoreList[j - 1] = scoreList[j];  
+                    }
+                    scoreList[i] = new GameScore(newScore, newName);
+                    break;
+                }
+            }
+        }
+    }
+
+    public class GameScoreTable : MonoBehaviour
+    {
+        private static GameScoreTable _instance;
+        public GameScoreList scoreList;
+
+        public static GameScoreTable Instance
+        {
+            get
+            {
+                if (_instance != null)
+                {
+                    return _instance;
+                }
+                else
+                {
+                    GameObject gm = GameObject.Find("SceneRoot");
+                    if (gm != null)
+                    {
+                        _instance = gm.AddComponent<GameScoreTable>();
+                        _instance.InitGameScoreTable();
+                        return _instance;
+                    }
+                    else
+                    {
+
+
+                        _instance = new GameObject("SceneRoot").AddComponent<GameScoreTable>();
+                        _instance.InitGameScoreTable();
+                        return _instance;
+                    }
+                }
+            }
+        }
+
+        public void InitGameScoreTable()
+        {
+            Instance.scoreList = new GameScoreList();
+            Instance.LoadTable();
+        }
+
+        public void LoadTable ()
+        {
+            // Using a FileStream, create an XmlTextReader.
+            string filename = Application.dataPath + "/Game/ScoreTable.xml";
+            Stream fs = new FileStream(filename, FileMode.Open);
+            XmlReader reader = new XmlTextReader(fs);
+            XmlSerializer serializer = new XmlSerializer(typeof(GameScoreList));
+            try
+            {
+                Instance.scoreList = (GameScoreList)serializer.Deserialize(reader);
+            }
+            catch (XmlException e)
+            {
+                //throw;
+                //Debug.Log("New table was created. Reason: "+Environment.NewLine+e.Message);
+                for (int i = 0; i < GameControllsSettings.MaxLeaderBoardSize; i++)
+                {
+                    Instance.scoreList.scoreList.Add(new GameScore(0, string.Empty));
+                }                
+            }
+            fs.Close();
+        }
+
+        public void SaveTable ()
+        {
+            XmlSerializer xml = new XmlSerializer(typeof(GameScoreList));
+            string path = Application.dataPath + "/Game/ScoreTable.xml";
+            File.SetAttributes(path, FileAttributes.Normal);
+            TextWriter stream = new StreamWriter(path);
+            xml.Serialize(stream, Instance.scoreList);
+            stream.Close();
+        }
+
+    }
 }
